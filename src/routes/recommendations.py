@@ -1,5 +1,4 @@
 from flask import Blueprint, request, jsonify
-from services.recommendation_engine import RecommendationEngine
 
 recommendations_bp = Blueprint('recommendations', __name__)
 
@@ -16,3 +15,7 @@ def get_recommendations():
     recommendations = recommendation_engine.generate_recommendations(user_id, compatibility_score)
 
     return jsonify(recommendations)
+
+@recommendations_bp.route('/recommendations')
+def recommendations():
+    return "Recommendations route"

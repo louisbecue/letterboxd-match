@@ -1,7 +1,4 @@
 from flask import Blueprint, request, jsonify
-from services.letterboxd_api import fetch_user_data
-from services.compatibility_calculator import CompatibilityCalculator
-from services.recommendation_engine import RecommendationEngine
 
 compare_bp = Blueprint('compare', __name__)
 
@@ -27,3 +24,7 @@ def compare_users():
         'compatibility_score': score,
         'recommendations': recommendations
     })
+
+@compare_bp.route('/compare')
+def compare():
+    return "Compare route"
