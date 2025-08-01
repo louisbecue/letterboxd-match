@@ -3,24 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <title>Letterboxd Compatibility Results</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
+    <header>
+        <h1>🎬 Compatibility Results</h1>
+    </header>
     <div class="container">
-        <h1>Compatibility Results</h1>
-        <p>User 1: {{ user1.username }}</p>
-        <p>User 2: {{ user2.username }}</p>
-        <h2>Compatibility Score: {{ compatibility_score }}</h2>
+        <h2>{{ user1.username }} &amp; {{ user2.username }}</h2>
+        <h3>Compatibility Score: <span style="color:#8fd400;">{{ compatibility_score }}</span></h3>
 
-        <h3>Recommended Movies:</h3>
+        <h3>Recommended Movies</h3>
         <ul>
             {% for movie in recommendations %}
-                <li>{{ movie.title }} ({{ movie.year }})</li>
+                <li>{{ movie.title }} <span style="color:#888;">({{ movie.year }})</span></li>
             {% endfor %}
         </ul>
 
-        <a href="{{ url_for('compare') }}">Compare Another Pair</a>
+        <a href="{{ url_for('compare') }}">&#8592; Compare another pair</a>
     </div>
+    <footer>
+        <p>&copy; 2025 Louis Becue — Not affiliated with Letterboxd</p>
+    </footer>
 </body>
 </html>
