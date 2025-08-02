@@ -1,5 +1,4 @@
 import requests
-import time
 
 class TMDBService:
     def __init__(self, api_key: str):
@@ -34,7 +33,6 @@ class TMDBService:
     def enrich_recommendations(self, recommendations: list):
         """Add poster URLs to recommendations"""
         for rec in recommendations:
-            time.sleep(0.05)
             poster_url = self.search_movie(rec['title'])
             rec['poster_url'] = poster_url
         return recommendations
