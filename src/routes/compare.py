@@ -98,14 +98,3 @@ def compare_users():
             compatibility_score=0,
             recommendations=[]
         )
-
-@compare_bp.route('/compare', methods=['POST'])
-def compare():
-    """POST endpoint for compare route using form data"""
-    username1 = request.form.get('username1')
-    username2 = request.form.get('username2')
-    return jsonify({
-        'message': 'Compare route - POST received',
-        'username1': username1,
-        'username2': username2
-    })
