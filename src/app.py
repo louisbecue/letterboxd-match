@@ -1,6 +1,5 @@
 from flask import Flask, render_template
 from .routes.compare import compare_bp
-from .routes.recommendations import recommendations_bp
 import sys
 import os
 
@@ -14,7 +13,6 @@ from config import Config
 app.config.from_object(Config)
 
 app.register_blueprint(compare_bp)
-app.register_blueprint(recommendations_bp)
 
 @app.route('/')
 def index():

@@ -2,3 +2,5 @@ Flask
 gunicorn
 setuptools
 wheel
+python-dotenv
+requests

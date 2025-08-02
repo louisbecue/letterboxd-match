@@ -9,7 +9,7 @@ A web app to compare two Letterboxd users, calculate a compatibility score, and 
 ## Technical Overview
 
 - **Backend:** Python 3, Flask
-- **Frontend:** HTML (Jinja2 templates), CSS, JS
+- **Frontend:** HTML (Jinja2 templates), CSS
 - **Deployment:** Render (Gunicorn)
 - **Configuration:** See [`config.py`](config.py)
 
@@ -18,11 +18,9 @@ A web app to compare two Letterboxd users, calculate a compatibility score, and 
 ```
 src/
   app.py                # Flask app entry point
-  routes/               # API routes (compare, recommendations)
-  models/               # Data models
+  routes/               # API routes
   services/             # Logic for compatibility & recommendations
-  utils/                # Helpers
-static/                 # CSS & JS
+static/                 # CSS
 templates/              # HTML templates
 Procfile                # For Render deployment
 requirements.txt        # Python dependencies
@@ -61,3 +59,4 @@ The site will be available at [http://127.0.0.1:5000](http://127.0.0.1:5000).
 
 > **Disclaimer:**  
 > This project is not affiliated with Letterboxd.
+pip install -r requirements.txt
