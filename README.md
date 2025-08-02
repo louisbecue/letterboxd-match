@@ -1,62 +1,59 @@
-# 🎬 Letterboxd Match
+# Letterboxd Match
 
-A web app to compare two Letterboxd users, calculate a compatibility score, and suggest movies.
+Letterboxd Match is a web app to compare two Letterboxd users, calculate a compatibility score, and suggest movies.
 
-**Live demo:** [https://letterboxd-match.onrender.com](https://letterboxd-match.onrender.com)
+**Online demo:** [https://letterboxd-match.onrender.com](https://letterboxd-match.onrender.com)
 
----
-
-## Technical Overview
+## Tech Stack
 
 - **Backend:** Python 3, Flask
-- **Frontend:** HTML (Jinja2 templates), CSS
+- **Frontend:** HTML (Jinja2), CSS
 - **Deployment:** Render (Gunicorn)
-- **Configuration:** See [`config.py`](config.py)
+- **Configuration:** [`config.py`](config.py)
 
 ## Project Structure
 
 ```
 src/
-  app.py                # Flask app entry point
+  app.py                # Flask entry point
   routes/               # API routes
-  services/             # Logic for compatibility & recommendations
-static/                 # CSS
+  services/             # Business logic (compatibility, recommendations)
+static/                 # CSS files
 templates/              # HTML templates
-Procfile                # For Render deployment
+Procfile                # Render/Gunicorn config
 requirements.txt        # Python dependencies
-config.py               # App configuration
+config.py               # App settings
 ```
 
-## Run Locally
+## Local Setup
 
-1. Create and activate a virtual environment
+1. Create and activate a virtual environment:
 
-```bash
-python3 -m venv .venv
-source .venv/bin/activate
-```
+   ```bash
+   python3 -m venv .venv
+   source .venv/bin/activate
+   ```
 
-2. Install dependencies
+2. Install dependencies:
 
-```bash
-pip install -r requirements.txt
-```
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-3. Start the development server
+3. Start the development server:
 
-```bash
-python -m src.app
-```
+   ```bash
+   python -m src.app
+   ```
 
-The site will be available at [http://127.0.0.1:5000](http://127.0.0.1:5000).
+   Access the app: [http://127.0.0.1:5000](http://127.0.0.1:5000)
 
-## Deployment
+## Deployment & CI/CD
 
-- All dependencies are listed in [`requirements.txt`](requirements.txt)
-- Ready for Render: connect your repository and deploy.
+- All dependencies are listed in [`requirements.txt`](requirements.txt).
+- Automatic deployment with Render: connect your Git repo, Render finds the `Procfile` and installs dependencies.
 
 ---
 
 > **Disclaimer:**  
-> This project is not affiliated with Letterboxd.
-pip install -r requirements.txt
+> This project is not affiliated with Letterboxd. For personal use only.
