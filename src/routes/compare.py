@@ -7,29 +7,30 @@ from ..services.scrapper import LetterboxdScraper
 from ..services.compatibility_calculator import calculate_score
 from ..services.recommendation_engine import generate_recommendations
 from ..services.tmdb_service import TMDBService
+import random
 
-# Charge les variables d'environnement
+
 load_dotenv()
-
 compare_bp = Blueprint('compare', __name__)
 TMDB_API_KEY = os.getenv('TMDB_API_KEY')
 
-# tmp
-import json
+# # tmp
+# import json
 
-def load_ratings(json_path):
-    with open(json_path, 'r') as f:
-        data = json.load(f)
-    ratings_dict = {}
-    for movie in data.get('ratings', []):
-        title = movie.get('title', 'Unknown Title')
-        ratings_dict[title] = {
-            'rating': movie.get('rating'),
-            'movie_id': movie.get('movie_id'),
-            'letterboxd_url': movie.get('letterboxd_url')
-        }
-    return ratings_dict
-#end tmp
+
+# def load_ratings(json_path):
+#     with open(json_path, 'r') as f:
+#         data = json.load(f)
+#     ratings_dict = {}
+#     for movie in data.get('ratings', []):
+#         title = movie.get('title', 'Unknown Title')
+#         ratings_dict[title] = {
+#             'rating': movie.get('rating'),
+#             'movie_id': movie.get('movie_id'),
+#             'letterboxd_url': movie.get('letterboxd_url')
+#         }
+#     return ratings_dict
+# #end tmp
 
 async def fetch_user_ratings(username: str) -> dict:
     """Fetch user ratings as a simple dictionary {movie_title: rating}"""
@@ -51,19 +52,17 @@ def compare_users():
         if not username1 or not username2:
             return render_template('results.html', error='Both username1 and username2 are required')
         
-        # # Run async function in Flask context
-        # loop = asyncio.new_event_loop()
-        # asyncio.set_event_loop(loop)
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
         
-        # try:
-        #     # Fetch user ratings as simple dictionaries
-        #     user1_ratings = loop.run_until_complete(fetch_user_ratings(username1))
-        #     user2_ratings = loop.run_until_complete(fetch_user_ratings(username2))
-        # finally:
-        #     loop.close()
+        try:
+            user1_ratings = loop.run_until_complete(fetch_user_ratings(username1))
+            user2_ratings = loop.run_until_complete(fetch_user_ratings(username2))
+        finally:
+            loop.close()
 
-        user1_ratings = load_ratings(f'tmp/louis_bce_letterboxd_ratings.json')
-        user2_ratings = load_ratings(f'tmp/emma_cinema_letterboxd_ratings.json')
+        # user1_ratings = load_ratings(f'tmp/louis_letterboxd_ratings.json')
+        # user2_ratings = load_ratings(f'tmp/emma_cinema_letterboxd_ratings.json')
 
         if not user1_ratings:
             return jsonify({'error': f'Could not fetch data for user {username1}'}), 404
@@ -74,7 +73,8 @@ def compare_users():
         compatibility_score = calculate_score(user1_ratings, user2_ratings)
         recommendations = generate_recommendations(user1_ratings, user2_ratings, username1, username2)
 
-        recs = recommendations.get(f"for_{username1}", []) + recommendations.get(f"for_{username2}", [])
+        recs = recommendations.get(f"for_{username1}", []) + recommendations.get(f"for_{username2}", [])  + recommendations.get(f"mutual_recommendations", [])
+        random.shuffle(recs)
 
         tmdb_service = TMDBService(TMDB_API_KEY)
         recs = tmdb_service.enrich_recommendations(recs)

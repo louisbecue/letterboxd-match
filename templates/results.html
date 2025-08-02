@@ -23,13 +23,16 @@
         <h3>Recommended Movies</h3>
         <ul class="movie-list-grid">
             {% for movie in recommendations %}
-                <li class="movie-item-grid">
+                <li class="movie-item-grid{% if movie.reason and 'Perfect match for' in movie.reason %} ai-recommendation{% endif %}">
                     <a href="{{ movie.letterboxd_url or '#' }}" target="_blank" rel="noopener noreferrer" class="movie-link">
                         <img src="{{ movie.poster_url or url_for('static', filename='img/default_poster.png') }}"
                              alt="Poster for {{ movie.title }}"
                              class="movie-poster-grid">
                         <div class="movie-info-grid">
                             <span class="movie-title">{{ movie.title }}</span>
+                            {% if movie.reason %}
+                                <span class="movie-reason">{{ movie.reason }}</span>
+                            {% endif %}
                         </div>
                     </a>
                 </li>

@@ -4,3 +4,6 @@ setuptools
 wheel
 python-dotenv
 requests
+pandas
+numpy
+scikit-learn

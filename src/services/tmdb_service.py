@@ -15,8 +15,6 @@ class TMDBService:
             'query': title,
             'language': 'en-US'
         }
-        if year:
-            params['year'] = year
         
         try:
             response = requests.get(url, params=params, timeout=5)
