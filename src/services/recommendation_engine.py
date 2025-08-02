@@ -7,7 +7,8 @@ import random
 
 def load_movielens_data():
     """Load MovieLens data"""
-    data_path = "/home/louis/git/letterboxd_match/data/ml-latest-small"
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    data_path = os.path.join(current_dir, "..", "..", "data", "ml-latest-small")
     
     movies = pd.read_csv(os.path.join(data_path, "movies.csv"))
     ratings = pd.read_csv(os.path.join(data_path, "ratings.csv"))
