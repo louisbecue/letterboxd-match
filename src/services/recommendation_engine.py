@@ -4,19 +4,38 @@ from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.feature_extraction.text import TfidfVectorizer
 import os
 import random
+import ast
 
-def load_movielens_data():
-    """Load MovieLens data"""
+def parse_genres(genre_str):
+        try:
+            if genre_str == '[]' or not genre_str:
+                return ''
+            genres = ast.literal_eval(genre_str)
+            return '|'.join(genres) if isinstance(genres, list) else ''
+        except:
+            return ''
+
+def load_letterboxd_data():
+    """Load Letterboxd data from CSV"""
     current_dir = os.path.dirname(os.path.abspath(__file__))
-    data_path = os.path.join(current_dir, "..", "..", "data", "ml-latest-small")
+    data_path = os.path.join(current_dir, "..", "..", "data", "Movie_Data_File_Light.csv")
     
-    movies = pd.read_csv(os.path.join(data_path, "movies.csv"))
-    ratings = pd.read_csv(os.path.join(data_path, "ratings.csv"))
-    tags = pd.read_csv(os.path.join(data_path, "tags.csv"))
+    movies = pd.read_csv(data_path)
     
-    return movies, ratings, tags
+    movies['Film_title'] = movies['Film_title'].fillna('')
+    movies['Genres'] = movies['Genres'].fillna('[]')
+    movies['Average_rating'] = pd.to_numeric(movies['Average_rating'], errors='coerce').fillna(0)
+    movies['Total_ratings'] = pd.to_numeric(movies['Total_ratings'], errors='coerce').fillna(0)
+    
+    movies['genres'] = movies['Genres'].apply(parse_genres)
+    movies['movieId'] = movies.index + 1
+    movies['title'] = movies['Film_title']
+    movies['mean'] = movies['Average_rating']
+    movies['count'] = movies['Total_ratings']
+    
+    return movies
 
-def calculate_user_preferences(user_ratings: dict, movies_df: pd.DataFrame, ratings_df: pd.DataFrame):
+def calculate_user_preferences(user_ratings: dict, movies_df: pd.DataFrame):
     """Calculate user preferences based on genres and ratings"""
     user_profile = {}
     
@@ -25,14 +44,16 @@ def calculate_user_preferences(user_ratings: dict, movies_df: pd.DataFrame, rati
         if isinstance(rating, (int, float)) and rating >= 3.5:
             movie_match = movies_df[movies_df['title'].str.contains(title.split('(')[0].strip(), case=False, na=False)]
             if not movie_match.empty:
-                genres = movie_match.iloc[0]['genres'].split('|')
-                for genre in genres:
-                    if genre != '(no genres listed)':
-                        user_profile[genre] = user_profile.get(genre, 0) + rating
+                genres_str = movie_match.iloc[0]['genres']
+                if genres_str and genres_str != '':
+                    genres = genres_str.split('|')
+                    for genre in genres:
+                        if genre.strip() and genre.strip() != '':
+                            user_profile[genre.strip()] = user_profile.get(genre.strip(), 0) + rating
     
     return user_profile
 
-def find_similar_movies(user1_profile: dict, user2_profile: dict, movies_df: pd.DataFrame, user1_ratings: dict, user2_ratings: dict, ratings_df: pd.DataFrame):
+def find_similar_movies(user1_profile: dict, user2_profile: dict, movies_df: pd.DataFrame, user1_ratings: dict, user2_ratings: dict):
     """Find movies similar to both users' preferences"""
     
     combined_preferences = {}
@@ -51,16 +72,16 @@ def find_similar_movies(user1_profile: dict, user2_profile: dict, movies_df: pd.
     recommendations = []
     seen_movies = set(user1_ratings.keys()) | set(user2_ratings.keys())
     recommended_titles = set()
-    
-    movie_avg_ratings = ratings_df.groupby('movieId')['rating'].agg(['mean', 'count']).reset_index()
-    movie_avg_ratings = movie_avg_ratings[movie_avg_ratings['count'] >= 10]
-    
-    movies_with_ratings = movies_df.merge(movie_avg_ratings, on='movieId', how='inner')
+
+    movies_with_ratings = movies_df[movies_df['count'] >= 1000].copy()
     
     preferred_genres_shuffled = preferred_genres.copy()
     random.shuffle(preferred_genres_shuffled)
     
     for genre, preference_score in preferred_genres_shuffled[:7]:
+        if not genre or genre.strip() == '':
+            continue
+            
         genre_movies = movies_with_ratings[movies_with_ratings['genres'].str.contains(genre, case=False, na=False)].copy()
         
         genre_movies = genre_movies[~genre_movies['title'].apply(lambda x: any(x.split('(')[0].strip().lower() in seen_title.lower() 
@@ -70,9 +91,9 @@ def find_similar_movies(user1_profile: dict, user2_profile: dict, movies_df: pd.
         
         if len(genre_movies) == 0:
             continue
-        
-        genre_movies['composite_score'] = (genre_movies['mean'] * 0.6 +np.random.random(len(genre_movies)) * 2 +
-                                           genre_movies['title'].apply(lambda x: get_year_bonus(x)) * 0.2)
+
+        genre_movies['composite_score'] = (genre_movies['mean'] * 0.6 + np.random.random(len(genre_movies)) * 1.5 +
+            genre_movies['title'].apply(lambda x: get_year_bonus(x)) * 0.3 + np.log(genre_movies['count'] + 1) * 0.1)
         
         genre_movies = genre_movies.sort_values('composite_score', ascending=False)
         
@@ -81,16 +102,14 @@ def find_similar_movies(user1_profile: dict, user2_profile: dict, movies_df: pd.
         for _, movie in genre_movies.head(num_movies).iterrows():
             if len(recommendations) < 20:
                 title_no_year = movie['title'].split('(')[0].strip()
-                
                 if title_no_year not in recommended_titles:
                     recommended_titles.add(title_no_year)
+                    letterboxd_url = movie.get('Film_URL', '')
+                    
                     recommendations.append({
                         "title": title_no_year,
                         "genres": movie['genres'],
-                        "avg_rating": round(movie['mean'], 2),
-                        "rating_count": movie['count'],
-                        "movie_id": movie['movieId'],
-                        "preference_match": round(preference_score, 2),
+                        "letterboxd_url": letterboxd_url,
                         "reason": f"Perfect match for your shared love of {genre} movies (★{round(movie['mean'], 1)})"
                     })
 
@@ -152,25 +171,23 @@ def generate_recommendations(user1_ratings: dict, user2_ratings: dict, user1_nam
     )[:5]
     
     try:
-        movies_df, ratings_df, tags_df = load_movielens_data()
-        
-        user1_profile = calculate_user_preferences(user1_ratings, movies_df, ratings_df)
-        user2_profile = calculate_user_preferences(user2_ratings, movies_df, ratings_df)
-        
-        mutual_recommendations = find_similar_movies(
-            user1_profile, user2_profile, movies_df, user1_ratings, user2_ratings, ratings_df
-        )
+        movies_df = load_letterboxd_data()
+        user1_profile = calculate_user_preferences(user1_ratings, movies_df)
+        user2_profile = calculate_user_preferences(user2_ratings, movies_df)
+        mutual_recommendations = find_similar_movies(user1_profile, user2_profile, movies_df, user1_ratings, user2_ratings)
         
     except Exception as e:
-        print(f"Error loading MovieLens data: {e}")
+        print(f"Error loading Letterboxd data: {e}")
         mutual_recommendations = []
+        user1_profile = {}
+        user2_profile = {}
 
     return {
         f"for_{user1_name}": recommendations_for_user1,
         f"for_{user2_name}": recommendations_for_user2,
         "mutual_recommendations": mutual_recommendations,
         "user_profiles": {
-            user1_name: user1_profile if 'user1_profile' in locals() else {},
-            user2_name: user2_profile if 'user2_profile' in locals() else {}
+            user1_name: user1_profile,
+            user2_name: user2_profile
         }
     }
