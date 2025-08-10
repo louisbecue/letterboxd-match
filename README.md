@@ -1,4 +1,8 @@
 # Letterboxd Match
+[![Python](https://img.shields.io/badge/Python-3.12%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![Flask](https://img.shields.io/badge/Flask-2%2B-000000?logo=flask&logoColor=white)](https://flask.palletsprojects.com/)
+[![Live on Render](https://img.shields.io/badge/Render-Live-46E3B4?logo=render&logoColor=white)](https://letterboxd-match.onrender.com)
+[![License](https://img.shields.io/badge/License-See%20LICENCE-lightgrey)](LICENCE)
 
 Letterboxd Match is a web app to compare two Letterboxd users, calculate a compatibility score, and suggest movies.
 
