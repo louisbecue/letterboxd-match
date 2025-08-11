@@ -103,23 +103,27 @@ def generate_recommendations(user1_ratings: dict, user2_ratings: dict, user1_nam
     recommendations_for_user2 = sorted(
         [{
             "title": title,
+            "rating": info.get('rating', 0),
             "letterboxd_url": info.get('letterboxd_url'),
             "reason": f"Loved by {user1_name} (★{info.get('rating')})"
         }
         for title, info in user1_ratings.items() 
         if (isinstance(info.get('rating'), (int, float)) and info.get('rating', 0) >= 4.0 and title not in user2_ratings)],
-        key=lambda x: x["rating"],reverse=True)[:5]
+        key=lambda x: x.get("rating", 0), reverse=True
+    )[:5]
     
     recommendations_for_user1 = sorted(
         [{
-                "title": title,
-                "letterboxd_url": info.get('letterboxd_url'),
-                "reason": f"Loved by {user2_name} (★{info.get('rating')})"
+            "title": title,
+            "rating": info.get('rating', 0),
+            "letterboxd_url": info.get('letterboxd_url'),
+            "reason": f"Loved by {user2_name} (★{info.get('rating')})"
         }
         for title, info in user2_ratings.items()
         if (isinstance(info.get('rating'), (int, float)) and info.get('rating', 0) >= 4.0 and title not in user1_ratings)],
-        key=lambda x: x["rating"],reverse=True)[:5]
-    
+        key=lambda x: x.get("rating", 0), reverse=True
+    )[:5]
+
     try:
         movies_df = load_letterboxd_data()
         user1_profile = calculate_user_preferences(user1_ratings, movies_df)

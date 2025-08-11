@@ -61,9 +61,6 @@ def compare_users():
         finally:
             loop.close()
 
-        # user1_ratings = load_ratings(f'tmp/louis_letterboxd_ratings.json')
-        # user2_ratings = load_ratings(f'tmp/emma_cinema_letterboxd_ratings.json')
-
         if not user1_ratings:
             return jsonify({'error': f'Could not fetch data for user {username1}'}), 404
         
@@ -72,7 +69,6 @@ def compare_users():
         
         compatibility_score = calculate_score(user1_ratings, user2_ratings)
         recommendations = generate_recommendations(user1_ratings, user2_ratings, username1, username2)
-
         recs = recommendations.get(f"for_{username1}", []) + recommendations.get(f"for_{username2}", [])  + recommendations.get(f"mutual_recommendations", [])
         random.shuffle(recs)
 
