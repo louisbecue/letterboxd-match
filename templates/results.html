@@ -12,12 +12,11 @@
     </header>
     <div class="container" style="text-align:center;">
         <h2>{{ user1.username }} &amp; {{ user2.username }}</h2>
-        <h3 style="text-align:center;">Compatibility Score: <span style="color:#8fd400;">{{ compatibility_score }}</span></h3>
+        <h3 style="text-align:center;">Compatibility Score: <span style="color:#8fd400;">{{ compatibility_score }} /100</span></h3>
         <div class="compat-bar-container">
             <div class="compat-bar-bg">
                 <div class="compat-bar-fill" style="width: {{ compatibility_score }}%;"></div>
             </div>
-            <div class="compat-bar-label">{{ compatibility_score }} / 100</div>
         </div>
 
         <h3>Recommended Movies</h3>
