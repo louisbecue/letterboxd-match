@@ -1,36 +1,13 @@
-from flask import Blueprint, request, jsonify, render_template
+from flask import Blueprint, request, jsonify, render_template, current_app
 import asyncio
-import time
 import os
-from dotenv import load_dotenv
 from ..services.scrapper import LetterboxdScraper
 from ..services.compatibility_calculator import calculate_score
 from ..services.recommendation_engine import generate_recommendations
 from ..services.tmdb_service import TMDBService
 import random
 
-
-load_dotenv()
 compare_bp = Blueprint('compare', __name__)
-TMDB_API_KEY = os.getenv('TMDB_API_KEY')
-
-# # tmp
-# import json
-
-
-# def load_ratings(json_path):
-#     with open(json_path, 'r') as f:
-#         data = json.load(f)
-#     ratings_dict = {}
-#     for movie in data.get('ratings', []):
-#         title = movie.get('title', 'Unknown Title')
-#         ratings_dict[title] = {
-#             'rating': movie.get('rating'),
-#             'movie_id': movie.get('movie_id'),
-#             'letterboxd_url': movie.get('letterboxd_url')
-#         }
-#     return ratings_dict
-# #end tmp
 
 async def fetch_user_ratings(username: str) -> dict:
     """Fetch user ratings as a simple dictionary {movie_title: rating}"""
@@ -72,7 +49,7 @@ def compare_users():
         recs = recommendations.get(f"for_{username1}", []) + recommendations.get(f"for_{username2}", [])  + recommendations.get(f"mutual_recommendations", [])
         random.shuffle(recs)
 
-        tmdb_service = TMDBService(TMDB_API_KEY)
+        tmdb_service = TMDBService(current_app.config.get('TMDB_API_KEY'))
         recs = tmdb_service.enrich_recommendations(recs)
 
         user1 = {'username': username1, 'total_ratings': len(user1_ratings)}

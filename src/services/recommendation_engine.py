@@ -140,8 +140,4 @@ def generate_recommendations(user1_ratings: dict, user2_ratings: dict, user1_nam
         f"for_{user1_name}": recommendations_for_user1,
         f"for_{user2_name}": recommendations_for_user2,
         "mutual_recommendations": mutual_recommendations,
-        "user_profiles": {
-            user1_name: user1_profile,
-            user2_name: user2_profile
-        }
     }
