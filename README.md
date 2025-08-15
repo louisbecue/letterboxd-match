@@ -6,7 +6,7 @@
 
 Letterboxd Match is a web app to compare two Letterboxd users, calculate a compatibility score, and suggest movies.
 
-**Online demo:** [https://web-production-9973c.up.railway.app/](https://web-production-9973c.up.railway.app/)
+**Online demo:** [letterboxd-match.up.railway.app](letterboxd-match.up.railway.app)
   
 **Alternate demo:** [https://letterboxd-match.onrender.com](https://letterboxd-match.onrender.com)
 
