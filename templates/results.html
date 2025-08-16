@@ -57,7 +57,7 @@
         <ul class="movie-list-grid">
             {% for movie in recommendations %}
             <li class="movie-item-grid">
-                <a href="https://letterboxd.com/film/{{ movie.slug }}/" target="_blank" class="movie-link">
+                <a href="{{ movie.letterboxd_url or '#' }}" target="_blank" rel="noopener noreferrer" class="movie-link">
                     <img src="{{ movie.poster_url }}" alt="{{ movie.title }}" class="movie-poster-grid">
                     <div class="movie-info-grid">
                         <span class="movie-title">{{ movie.title }}</span>

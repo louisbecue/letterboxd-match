@@ -461,7 +461,7 @@ body.loading #loading-overlay {
     text-align: center;
     width: 100%;
     max-width: 350px;
-    margin: 2rem auto; /* Ajout pour centrer */
+    margin: 2rem auto;
 }
 
 .pattern-card h4 {
