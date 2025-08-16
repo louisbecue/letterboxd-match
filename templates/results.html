@@ -1,40 +1,72 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Letterboxd Compatibility Results</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
+
 <body>
     <header>
         <h1>Compatibility Results</h1>
     </header>
     <div class="container" style="text-align:center;">
         <h2>{{ user1.username }} &amp; {{ user2.username }}</h2>
-        <h3 style="text-align:center;">Compatibility Score: <span style="color:#8fd400;">{{ compatibility_score }} /100</span></h3>
+        <h3 style="text-align:center;">Compatibility Score: <span style="color:#8fd400;">{{ compatibility_score }}
+                /100</span></h3>
         <div class="compat-bar-container">
             <div class="compat-bar-bg">
                 <div class="compat-bar-fill" style="width: {{ compatibility_score }}%;"></div>
+            </div>
+        </div>
+        <p style="text-align:center; margin-top: 10px;">
+            <strong>Films seen in common:</strong> {{ common_movies }}
+        </p>
+
+        {% if rating_patterns %}
+        <div class="pattern-card">
+            <h4>Average Ratings</h4>
+            <div class="rating-comparison">
+                <div class="user-rating">
+                    <span class="username">{{ user1.username }}</span>
+                    <span class="rating-value">{{ rating_patterns.user1_average }}★</span>
+                </div>
+                <div class="user-rating">
+                    <span class="username">{{ user2.username }}</span>
+                    <span class="rating-value">{{ rating_patterns.user2_average }}★</span>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="favorites-section">
+            <h3>Top 4 Favorite Films</h3>
+            <div class="favorites-grid">
+                {% for movie in four_favorite_movies %}
+                <div class="favorite-movie">
+                    <img src="{{ movie.poster_url }}" alt="{{ movie.title }}" class="favorite-movie-poster">
+                    <div class="favorite-movie-title">{{ movie.title }}</div>
+                </div>
+                {% endfor %}
             </div>
         </div>
 
         <h3>Recommended Movies</h3>
         <ul class="movie-list-grid">
             {% for movie in recommendations %}
-                <li class="movie-item-grid{% if movie.reason and 'Perfect match for' in movie.reason %} ai-recommendation{% endif %}">
-                    <a href="{{ movie.letterboxd_url or '#' }}" target="_blank" rel="noopener noreferrer" class="movie-link">
-                        <img src="{{ movie.poster_url or url_for('static', filename='img/default_poster.png') }}"
-                             alt="Poster for {{ movie.title }}"
-                             class="movie-poster-grid">
-                        <div class="movie-info-grid">
-                            <span class="movie-title">{{ movie.title }}</span>
-                            {% if movie.reason %}
-                                <span class="movie-reason">{{ movie.reason }}</span>
-                            {% endif %}
-                        </div>
-                    </a>
-                </li>
+            <li class="movie-item-grid">
+                <a href="https://letterboxd.com/film/{{ movie.slug }}/" target="_blank" class="movie-link">
+                    <img src="{{ movie.poster_url }}" alt="{{ movie.title }}" class="movie-poster-grid">
+                    <div class="movie-info-grid">
+                        <span class="movie-title">{{ movie.title }}</span>
+                        {% if movie.reason and movie.reason.strip('- ').strip() %}
+                        <span class="movie-reason">{{ movie.reason }}</span>
+                        {% endif %}
+                    </div>
+                </a>
+            </li>
             {% endfor %}
         </ul>
 
@@ -44,4 +76,5 @@
         <p>&copy; 2025 Louis Becue — Not affiliated with Letterboxd</p>
     </footer>
 </body>
+
 </html>

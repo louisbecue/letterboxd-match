@@ -39,7 +39,7 @@ def calculate_user_preferences(user_ratings: dict, movies_df: pd.DataFrame):
     for title, info in user_ratings.items():
         rating = info.get('rating', 0)
         if isinstance(rating, (int, float)) and rating >= 3.5:
-            movie_match = movies_df[movies_df['title'].str.contains(title, case=False, na=False)]
+            movie_match = movies_df[movies_df['title'].str.contains(title, case=False, na=False, regex=False)]
             if not movie_match.empty:
                 genres_str = movie_match.iloc[0]['genres']
                 if genres_str:

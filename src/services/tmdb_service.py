@@ -30,9 +30,9 @@ class TMDBService:
             print(f"TMDB error for '{title}': {e}")
             return None
     
-    def enrich_recommendations(self, recommendations: list):
-        """Add poster URLs to recommendations"""
-        for rec in recommendations:
-            poster_url = self.search_movie(rec['title'])
-            rec['poster_url'] = poster_url
-        return recommendations
+    def enrich_movies_with_poster(self, movies: list):
+        """Add poster URLs to movies"""
+        for movie in movies:
+            poster_url = self.search_movie(movie['title'])
+            movie['poster_url'] = poster_url
+        return movies

@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify, render_template, current_app
 import asyncio
 import os
 from ..services.scrapper import LetterboxdScraper
-from ..services.compatibility_calculator import calculate_score
+from ..services.compatibility_calculator import calculate_score, four_favorite_movies, rating_patterns
 from ..services.recommendation_engine import generate_recommendations
 from ..services.tmdb_service import TMDBService
 import random
@@ -44,30 +44,42 @@ def compare_users():
         if not user2_ratings:
             return jsonify({'error': f'Could not fetch data for user {username2}'}), 404
         
-        compatibility_score = calculate_score(user1_ratings, user2_ratings)
+        compatibility_score, num_common_movies = calculate_score(user1_ratings, user2_ratings)
+        fav_movies = four_favorite_movies(user1_ratings, user2_ratings)
+
+        patterns = rating_patterns(user1_ratings, user2_ratings)
+
         recommendations = generate_recommendations(user1_ratings, user2_ratings, username1, username2)
         recs = recommendations.get(f"for_{username1}", []) + recommendations.get(f"for_{username2}", [])  + recommendations.get(f"mutual_recommendations", [])
         random.shuffle(recs)
 
         tmdb_service = TMDBService(current_app.config.get('TMDB_API_KEY'))
-        recs = tmdb_service.enrich_recommendations(recs)
+        recs = tmdb_service.enrich_movies_with_poster(recs)
+        fav_movies = tmdb_service.enrich_movies_with_poster(fav_movies)
 
         user1 = {'username': username1, 'total_ratings': len(user1_ratings)}
         user2 = {'username': username2, 'total_ratings': len(user2_ratings)}
-
+        
         return render_template(
             'results.html',
             user1=user1,
             user2=user2,
             compatibility_score=compatibility_score,
-            recommendations=recs
+            recommendations=recs,
+            four_favorite_movies=fav_movies,
+            common_movies=num_common_movies,
+            rating_patterns=patterns
         )
     except Exception as e:
+        print("nop")
         return render_template(
             'results.html',
             error=f'Internal server error: {str(e)}', 
             user1={'username': '', 'total_ratings': 0},
             user2={'username': '', 'total_ratings': 0},
             compatibility_score=0,
-            recommendations=[]
+            recommendations=[],
+            four_favorite_movies=[],
+            common_movies=0,
+            rating_patterns={}
         )
