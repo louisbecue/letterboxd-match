@@ -6,32 +6,19 @@
 
 Letterboxd Match is a web app to compare two Letterboxd users, calculate a compatibility score, and suggest movies.
 
-**Online demo:** [https://letterboxd-match.up.railway.app](https://letterboxd-match.up.railway.app)
-  
-**Alternate demo:** [https://letterboxd-match.onrender.com](https://letterboxd-match.onrender.com)
-
-
 ## Tech Stack
 
-- **Backend:** Python 3, Flask
-- **Frontend:** HTML (Jinja2), CSS
-- **Deployment:** Gunicorn
-- **Configuration:** [`config.py`](config.py)
-- **Depenencies:** [`requirements.txt`](requirements.txt)
+| Component         | Technology                             |
+|-------------------|----------------------------------------|
+| **Backend**       | Python 3, Flask                        |
+| **Frontend**      | HTML (Jinja2), CSS                     |
+| **Deployment**    | Gunicorn                               |
+| **Configuration** | [`config.py`](config.py)               |
+| **Dependencies**  | [`requirements.txt`](requirements.txt) |
 
-## Project Structure
+## Online demo
 
-```
-src/
-  app.py                # Flask entry point
-  routes/               # API routes
-  services/             # Business logic (compatibility, recommendations)
-static/                 # CSS files
-templates/              # HTML templates
-Procfile                # Render/Gunicorn config
-requirements.txt        # Python dependencies
-config.py               # App settings
-```
+[https://letterboxd-match.onrender.com](https://letterboxd-match.onrender.com)
 
 ## Local Setup
 
@@ -60,3 +47,7 @@ config.py               # App settings
 
 > **Disclaimer:**  
 > This project is not affiliated with Letterboxd. For personal use only.
+
+> **Note:**  
+> This project is no longer maintained.  
+> Due to changes in Letterboxd's data structure, some functionality may no longer work.
