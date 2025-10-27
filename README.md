@@ -48,6 +48,5 @@ Access the app: [http://127.0.0.1:5000](http://127.0.0.1:5000)
 > **Disclaimer:**  
 > This project is not affiliated with Letterboxd. For personal use only.
 
-> **Note:**  
-> This project is no longer maintained.  
+> **Note:**
 > Due to changes in Letterboxd's data structure, some functionality may no longer work.
