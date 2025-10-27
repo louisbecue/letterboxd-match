@@ -7,7 +7,9 @@ class TMDBService:
         self.image_base_url = "https://image.tmdb.org/t/p/w500"
     
     def search_movie(self, title: str, year: str = None):
-        """Search for a movie by title"""
+        """
+        Search for a movie by title.
+        """
         url = f"{self.base_url}/search/movie"
         params = {
             'api_key': self.api_key,
@@ -31,7 +33,9 @@ class TMDBService:
             return None
     
     def enrich_movies_with_poster(self, movies: list):
-        """Add poster URLs to movies"""
+        """
+        Add poster URLs to movies.
+        """
         for movie in movies:
             poster_url = self.search_movie(movie['title'])
             movie['poster_url'] = poster_url
