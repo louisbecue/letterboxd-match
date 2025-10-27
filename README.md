@@ -24,24 +24,24 @@ Letterboxd Match is a web app to compare two Letterboxd users, calculate a compa
 
 1. Create and activate a virtual environment:
 
-   ```bash
-   python3 -m venv .venv
-   source .venv/bin/activate
-   ```
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+```
 
 2. Install dependencies:
 
-   ```bash
-   pip install -r requirements.txt
-   ```
+```bash
+pip install -r requirements.txt
+```
 
 3. Start the development server:
 
-   ```bash
-   python -m src.app
-   ```
+```bash
+python -m src.app
+```
 
-   Access the app: [http://127.0.0.1:5000](http://127.0.0.1:5000)
+Access the app: [http://127.0.0.1:5000](http://127.0.0.1:5000)
 
 ---
 
