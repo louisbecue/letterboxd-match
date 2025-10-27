@@ -1,11 +1,8 @@
-import os
 import json
 import asyncio
 from aiohttp import ClientSession
 from bs4 import BeautifulSoup
 from typing import List, Dict, Optional
-import argparse
-from datetime import datetime
 import re
 
 
@@ -53,23 +50,16 @@ class LetterboxdScraper:
         
         soup = BeautifulSoup(content, 'html.parser')
         try:
-            pagination = soup.find("div", class_="pagination")
+            pagination = soup.select_one("div.pagination")
             if not pagination:
                 return 1
             
-            page_links = pagination.find_all("a")
-            if not page_links:
-                return 1
-
-            page_numbers = []
-            for link in page_links:
-                href = link.get('href', '')
-                page_match = re.search(r'/page/(\d+)/', href)
-                if page_match:
-                    page_numbers.append(int(page_match.group(1)))
-            
+            page_links = pagination.find_all("a", href=True)
+            page_numbers = [
+                int(re.search(r'/page/(\d+)/', link['href']).group(1))
+                for link in page_links if re.search(r'/page/(\d+)/', link['href'])
+            ]
             return max(page_numbers) if page_numbers else 1
-            
         except Exception as e:
             print(f"Error getting page count: {e}")
             return 1
@@ -81,7 +71,7 @@ class LetterboxdScraper:
                 try:
                     rating_num = int(class_name.replace('rated-', ''))
                     return rating_num / 2.0
-                except (ValueError, IndexError):
+                except ValueError:
                     continue
         return None
 
@@ -93,11 +83,8 @@ class LetterboxdScraper:
             return []
         
         soup = BeautifulSoup(content, 'html.parser')
-
-        movies = soup.find_all("li", class_="griditem")
+        movies = soup.select("li.griditem")
         ratings = []
-        
-        print(f"Found {len(movies)} movie items on page {page}")
         
         for movie in movies:
             try:
@@ -109,6 +96,8 @@ class LetterboxdScraper:
                 if not movie_title:
                     continue
                 
+                movie_title = re.sub(r'\s*\(\d{4}(?:[^)]*)\)\s*$', '', movie_title).strip()
+                    
                 movie_slug = react_component.get("data-item-slug")
                 movie_url = f"{self.base_url}/film/{movie_slug}/" if movie_slug else None
 
@@ -122,57 +111,40 @@ class LetterboxdScraper:
                         rating_value = self.extract_rating_from_classes(classes)
                 
                 if rating_value is not None:
-                    movie_data = {
+                    ratings.append({
                         "movie_id": movie_slug or "unknown",
                         "title": movie_title,
                         "rating": rating_value,
                         "letterboxd_url": movie_url
-                    }
-                    ratings.append(movie_data)
-                    print(f"Found rated movie: {movie_title} ({rating_value}★)")
-                
+                    })
             except Exception as e:
                 print(f"Error parsing movie: {e}")
                 continue
         
-        print(f"Successfully extracted {len(ratings)} ratings from page {page}")
         return ratings
 
     async def scrape_user_ratings(self, username: str, max_pages: Optional[int] = None) -> List[Dict]:
         """Scrape all ratings for a user"""
-        print(f"Getting page count for user: {username}")
         total_pages = await self.get_user_page_count(username)
-        
         if total_pages == 0:
             print(f"No pages found for user: {username}")
             return []
         
         if max_pages:
             total_pages = min(total_pages, max_pages)
-        
-        print(f"Scraping {total_pages} pages for user: {username}")
 
-        semaphore = asyncio.Semaphore(3)
+        tasks = [
+            self.scrape_user_ratings_page(username, page)
+            for page in range(1, total_pages + 1)
+        ]
         
-        async def scrape_with_semaphore(page):
-            async with semaphore:
-                await asyncio.sleep(1.0)
-                return await self.scrape_user_ratings_page(username, page)
-        
+        results = await asyncio.gather(*tasks, return_exceptions=True)
         all_ratings = []
-
-        for page in range(1, total_pages + 1):
-            try:
-                print(f"Processing page {page}/{total_pages}")
-                page_ratings = await self.scrape_user_ratings_page(username, page)
-                all_ratings.extend(page_ratings)
-
-                if page < total_pages:
-                    await asyncio.sleep(1.5)
-                    
-            except Exception as e:
-                print(f"Error scraping page {page}: {e}")
-                continue
+        for result in results:
+            if isinstance(result, list):
+                all_ratings.extend(result)
+            else:
+                print(f"Error in scraping task: {result}")
         
         return all_ratings
 
@@ -182,17 +154,14 @@ class LetterboxdScraper:
         {movie_title: {'rating': ..., 'movie_id': ..., 'letterboxd_url': ...}}
         """
         ratings_list = await self.scrape_user_ratings(username, max_pages)
-        ratings_dict = {}
-        
-        for movie in ratings_list:
-            if movie.get('rating') is not None:
-                ratings_dict[movie['title']] = {
-                    'rating': movie['rating'],
-                    'movie_id': movie.get('movie_id'),
-                    'letterboxd_url': movie.get('letterboxd_url'),
-                }
-        
-        print(f"Found {len(ratings_dict)} rated movies for {username}")
+        ratings_dict = {
+            movie['title']: {
+                'rating': movie['rating'],
+                'movie_id': movie.get('movie_id'),
+                'letterboxd_url': movie.get('letterboxd_url'),
+            }
+            for movie in ratings_list if movie.get('rating') is not None
+        }
         return ratings_dict
 
     def save_to_json(self, data: List[Dict], filename: str):
@@ -204,34 +173,3 @@ class LetterboxdScraper:
         except Exception as e:
             print(f"Error saving data: {e}")
 
-
-async def main():
-    parser = argparse.ArgumentParser(description="Scraper to retrieve Letterboxd ratings")
-    parser.add_argument("username", help="Letterboxd username")
-    parser.add_argument("-o", "--output", default=None, help="JSON output file")
-    parser.add_argument("-p", "--pages", type=int, default=None, help="Maximum number of pages to scrape")
-    args = parser.parse_args()
-    
-    output_file = args.output or f"{args.username}_letterboxd_ratings.json"
-    
-    async with LetterboxdScraper() as scraper:
-        print(f"Starting scrape for user: {args.username}")
-        ratings = await scraper.scrape_user_ratings(args.username, args.pages)
-        
-        if ratings:
-            output_data = {
-                "username": args.username,
-                "total_ratings": len(ratings),
-                "scrape_date": datetime.now().isoformat(),
-                "ratings": ratings
-            }
-            scraper.save_to_json(output_data, output_file)
-
-            ratings_dict = await scraper.get_user_ratings_dict(args.username, args.pages)
-            print(f"Successfully scraped {len(ratings)} movies with {len(ratings_dict)} rated movies")
-        else:
-            print("No ratings found")
-
-
-if __name__ == "__main__":
-    asyncio.run(main())
