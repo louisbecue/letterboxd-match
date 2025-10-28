@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ username }} - Letterboxd Profile Analysis</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/solo.css') }}">
+</head>
+
+<body>
+    <header>
+        <h1>Profile Analysis</h1>
+    </header>
+    
+    {% if error %}
+    <div class="container" style="text-align:center;">
+        <div class="error-message">
+            <h2>Error</h2>
+            <p>{{ error }}</p>
+            <a href="{{ url_for('index') }}">← Go back</a>
+        </div>
+    </div>
+    {% else %}
+    
+    <div class="container" style="text-align:center;">
+        <h2>{{ username }}'s Profile</h2>
+        
+        {% if stats %}
+        <div class="stats-section">
+            <h3>Your Statistics</h3>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number">{{ stats.total_movies }}</div>
+                    <div class="stat-label">Movies Rated</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">{{ stats.average_rating }}★</div>
+                    <div class="stat-label">Average Rating</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">{{ stats.most_common_rating }}★</div>
+                    <div class="stat-label">Most Common Rating</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">{{ stats.highest_rated }}★</div>
+                    <div class="stat-label">Highest Rating</div>
+                </div>
+            </div>
+            
+            <div class="rating-distribution">
+                <h4>Rating Distribution</h4>
+                <div class="distribution-bars">
+                    <div class="bar-item">
+                        <span class="bar-label">5★</span>
+                        <div class="bar">
+                            <div class="bar-fill" style="width: {{ (stats.rating_distribution['5_stars'] / stats.total_movies * 100) if stats.total_movies > 0 else 0 }}%"></div>
+                        </div>
+                        <span class="bar-count">{{ stats.rating_distribution['5_stars'] }}</span>
+                    </div>
+                    <div class="bar-item">
+                        <span class="bar-label">4.5★</span>
+                        <div class="bar">
+                            <div class="bar-fill" style="width: {{ (stats.rating_distribution['4.5_stars'] / stats.total_movies * 100) if stats.total_movies > 0 else 0 }}%"></div>
+                        </div>
+                        <span class="bar-count">{{ stats.rating_distribution['4.5_stars'] }}</span>
+                    </div>
+                    <div class="bar-item">
+                        <span class="bar-label">4★</span>
+                        <div class="bar">
+                            <div class="bar-fill" style="width: {{ (stats.rating_distribution['4_stars'] / stats.total_movies * 100) if stats.total_movies > 0 else 0 }}%"></div>
+                        </div>
+                        <span class="bar-count">{{ stats.rating_distribution['4_stars'] }}</span>
+                    </div>
+                    <div class="bar-item">
+                        <span class="bar-label">3.5★</span>
+                        <div class="bar">
+                            <div class="bar-fill" style="width: {{ (stats.rating_distribution['3.5_stars'] / stats.total_movies * 100) if stats.total_movies > 0 else 0 }}%"></div>
+                        </div>
+                        <span class="bar-count">{{ stats.rating_distribution['3.5_stars'] }}</span>
+                    </div>
+                    <div class="bar-item">
+                        <span class="bar-label">3★</span>
+                        <div class="bar">
+                            <div class="bar-fill" style="width: {{ (stats.rating_distribution['3_stars'] / stats.total_movies * 100) if stats.total_movies > 0 else 0 }}%"></div>
+                        </div>
+                        <span class="bar-count">{{ stats.rating_distribution['3_stars'] }}</span>
+                    </div>
+                    <div class="bar-item">
+                        <span class="bar-label"><3★</span>
+                        <div class="bar">
+                            <div class="bar-fill" style="width: {{ (stats.rating_distribution['below_3'] / stats.total_movies * 100) if stats.total_movies > 0 else 0 }}%"></div>
+                        </div>
+                        <span class="bar-count">{{ stats.rating_distribution['below_3'] }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if recommendations %}
+        <h3>Recommended for You</h3>
+        <ul class="movie-list-grid">
+            {% for movie in recommendations %}
+            <li class="movie-item-grid">
+                <a href="{{ movie.letterboxd_url or '#' }}" target="_blank" rel="noopener noreferrer" class="movie-link">
+                    <img src="{{ movie.poster_url }}" alt="{{ movie.title }}" class="movie-poster-grid">
+                    <div class="movie-info-grid">
+                        <span class="movie-title">{{ movie.title }}</span>
+                        {% if movie.reason and movie.reason.strip('- ').strip() %}
+                        <span class="movie-reason">{{ movie.reason }}</span>
+                        {% endif %}
+                    </div>
+                </a>
+            </li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+
+        <a href="{{ url_for('index') }}">← Analyze another profile</a>
+    </div>
+    
+    {% endif %}
+    
+    <footer>
+        <p>&copy; 2025 Louis Becue</p>
+    </footer>
+</body>
+
+</html>

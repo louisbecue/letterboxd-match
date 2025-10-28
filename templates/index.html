@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Letterboxd Match</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
 </head>
 <body>
     <header>
@@ -12,7 +13,24 @@
         <p>Compare two users and discover your movie compatibility!</p>
     </header>
     <main>
-        <form action="/compare" method="post">
+        <div class="mode-selector">
+            <button id="solo-mode-btn" class="mode-btn" onclick="switchMode('solo')" aria-label="Switch to Solo Mode">Solo Mode</button>
+            <button id="duo-mode-btn" class="mode-btn" onclick="switchMode('duo')" aria-label="Switch to Duo Mode">Duo Mode</button>
+        </div>
+
+        <!-- Solo Mode Form -->
+        <form id="solo-form" action="/analyze" method="post" class="mode-form">
+            <h2>Solo Analysis</h2>
+            <p>Analyze your Letterboxd profile and get personalized recommendations</p>
+            <label for="solo-user">Your Username</label>
+            <input type="text" id="solo-user" name="username" placeholder="Your Letterboxd username" required>
+            <button type="submit">Analyze Profile</button>
+        </form>
+
+        <!-- Duo Mode Form -->
+        <form id="duo-form" action="/compare" method="post" class="mode-form">
+            <h2>Duo Comparison</h2>
+            <p>Compare two users and discover your movie compatibility</p>
             <label for="user1">User 1</label>
             <input type="text" id="user1" name="user1" placeholder="Letterboxd username" required>
             <label for="user2">User 2</label>

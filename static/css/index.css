@@ -1,0 +1,98 @@
+/* Mode Selector */
+.mode-selector {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 2rem;
+    gap: 1rem;
+}
+
+.mode-btn {
+    padding: 0.75rem 1.5rem;
+    border: 2px solid var(--lx-blue);
+    background: transparent;
+    color: var(--lx-blue);
+    cursor: pointer;
+    border-radius: var(--radius-md);
+    transition: var(--transition);
+    font-size: 1rem;
+    font-weight: 500;
+    font-family: var(--font-stack);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    backdrop-filter: blur(8px);
+}
+
+.mode-btn.active,
+.mode-btn:hover {
+    background: var(--lx-blue);
+    color: var(--text-primary);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(64, 188, 244, 0.3);
+}
+
+/* Forms */
+.mode-form {
+    display: none;
+    animation: fadeIn 0.3s ease;
+}
+
+.mode-form.active {
+    display: block;
+}
+
+.mode-form h2 {
+    margin-bottom: 0.5rem;
+    color: var(--text-primary);
+    text-align: center;
+    font-size: 1.5rem;
+    background: linear-gradient(135deg, var(--lx-orange), var(--lx-green));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.mode-form p {
+    margin-bottom: 1.5rem;
+    color: var(--text-secondary);
+    font-style: italic;
+    text-align: center;
+    font-size: 0.95rem;
+    opacity: 0.8;
+}
+
+.mode-form button {
+    width: 100%;
+    margin-top: 0.5rem;
+}
+
+@keyframes fadeIn {
+    from { 
+        opacity: 0; 
+        transform: translateY(-10px); 
+    }
+    to { 
+        opacity: 1; 
+        transform: translateY(0); 
+    }
+}
+
+/* Responsive design for mode selector */
+@media (max-width: 768px) {
+    .mode-selector {
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .mode-btn {
+        width: 200px;
+    }
+}
+
+@media (max-width: 480px) {
+    .mode-btn {
+        width: 180px;
+        padding: 0.6rem 1rem;
+        font-size: 0.9rem;
+    }
+}

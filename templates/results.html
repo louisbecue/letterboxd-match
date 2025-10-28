@@ -5,7 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Letterboxd Compatibility Results</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/results.css') }}">
 </head>
 
 <body>
@@ -40,18 +41,6 @@
             </div>
         </div>
         {% endif %}
-
-        <div class="favorites-section">
-            <h3>Top 4 Favorite Films</h3>
-            <div class="favorites-grid">
-                {% for movie in four_favorite_movies %}
-                <div class="favorite-movie">
-                    <img src="{{ movie.poster_url }}" alt="{{ movie.title }}" class="favorite-movie-poster">
-                    <div class="favorite-movie-title">{{ movie.title }}</div>
-                </div>
-                {% endfor %}
-            </div>
-        </div>
 
         <h3>Recommended Movies</h3>
         <ul class="movie-list-grid">
